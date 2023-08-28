@@ -1,6 +1,9 @@
 ---
 title: "Multilevel Modeling of Formula 1 Track Evolution"
-format: html
+format: gfm
+output: 
+  md_document:
+    variant: markdown_github
 ---
 
 ```{r message=FALSE, warning=FALSE, echo=FALSE}
