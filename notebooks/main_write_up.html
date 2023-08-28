@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.1.189">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Multilevel Modeling of Formula 1 Track Evolution</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1.6em;
+  vertical-align: middle;
+}
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+
+<script src="main_write_up_files/libs/clipboard/clipboard.min.js"></script>
+<script src="main_write_up_files/libs/quarto-html/quarto.js"></script>
+<script src="main_write_up_files/libs/quarto-html/popper.min.js"></script>
+<script src="main_write_up_files/libs/quarto-html/tippy.umd.min.js"></script>
+<script src="main_write_up_files/libs/quarto-html/anchor.min.js"></script>
+<link href="main_write_up_files/libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="main_write_up_files/libs/quarto-html/quarto-syntax-highlighting.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="main_write_up_files/libs/bootstrap/bootstrap.min.js"></script>
+<link href="main_write_up_files/libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="main_write_up_files/libs/bootstrap/bootstrap.min.css" rel="stylesheet" id="quarto-bootstrap" data-mode="light">
+
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+</head>
+
+<body class="fullcontent">
+
+<div id="quarto-content" class="page-columns page-rows-contents page-layout-article">
+
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title">Multilevel Modeling of Formula 1 Track Evolution</h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+    
+  </div>
+  
+
+</header>
+
+<div class="cell">
+
+</div>
+<section id="introduction" class="level2">
+<h2 class="anchored" data-anchor-id="introduction">Introduction</h2>
+<p>In car racing, the track surface can change significantly over the course of an event leading to variation in lap times. Lap time variation can exist for many reasons, but “track evolution” is known to cause a decrease in lap times due to additional rubber laying down on the track, increasing grip.</p>
+<p>To quantify track evolution at a recent Formula 1 qualifying event, a Bayesian hierarchical model is used and the inferences are compared to simple linear regression models. The 2022 Abu Dhabi Grand Prix qualifying session is analyzed using the FastF1 API and rstanarm Bayesian models.</p>
+</section>
+<section id="data-fastf1" class="level2">
+<h2 class="anchored" data-anchor-id="data-fastf1">Data: FastF1</h2>
+<p>The data for this analysis was sourced from the FastF1 API (https://theoehrly.github.io/Fast-F1/). This API provides access to F1 lap times, car telemetry, session results, and more. It is a Python module designed for use with Pandas, NumPy, and Matplotlib. However, the following analysis will make use of R packages, so the data are downloaded and stored as CSV files.</p>
+</section>
+<section id="the-2022-abu-dhabi-grand-prix" class="level2">
+<h2 class="anchored" data-anchor-id="the-2022-abu-dhabi-grand-prix">The 2022 Abu Dhabi Grand Prix</h2>
+<p>In the 2022 Formula 1 season, the last event of the year was the 2022 Abu Dhabi Grand Prix. During qualifying, many commentators observed there was a great amount of track evolution. By accessing all lap times during this qualifying session, we can quantify the degree of track evolution during this event.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb1"><pre class="sourceCode python code-with-copy"><code class="sourceCode python"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="im">import</span> fastf1</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="co"># works faster if there is a cache folder</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>fastf1.Cache.enable_cache(<span class="st">'../data/cache'</span>)</span>
+<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="co"># load the 2022 Abu Dhabi Grand Prix qualifying dataset</span></span>
+<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>qual <span class="op">=</span> fastf1.get_session(<span class="dv">2022</span>, <span class="st">'Abu Dhabi Grand Prix'</span>, <span class="st">'Q'</span>)</span>
+<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>qual.load()</span>
+<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a><span class="co"># get the team colors for plotting and save as CSV</span></span>
+<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>colors <span class="op">=</span> qual.results[[<span class="st">'TeamColor'</span>, <span class="st">'TeamName'</span>]]</span>
+<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>colors.to_csv(<span class="st">'../data/team_colors.csv'</span>)</span>
+<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a><span class="co"># get laptimes and convert to seconds</span></span>
+<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>qlaps <span class="op">=</span> qual.laps</span>
+<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>qlaps[<span class="st">'LapTime'</span>] <span class="op">=</span> qlaps[<span class="st">'LapTime'</span>].dt.total_seconds()</span>
+<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a><span class="co"># save as CSV</span></span>
+<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>qlaps.to_csv(<span class="st">'../data/laps.csv'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+</section>
+<section id="lap-times" class="level2">
+<h2 class="anchored" data-anchor-id="lap-times">Lap Times</h2>
+<p>We can look at the laptimes for all drivers during all three qualifying sessions.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="main_write_up_files/figure-html/unnamed-chunk-3-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Here the green sections represent active qualifying sessions (Q1, Q2, and Q3) and red sections represent breaks between the sessions (for more details on the F1 qualifying format can be found at https://en.wikipedia.org/wiki/Formula_One#Qualifying).</p>
+<p>There is a clear distinction between fast times and very slow times. The group of fast times are “flying laps” and the slower times are “out laps”, where drivers come from the pitlane prior to starting a flying lap, and “in laps”, where the drivers finish a flying lap and continue on prior to entering the pitlane.</p>
+<p>Only flying laps are considered for this analysis, so times above 90 seconds are removed.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="main_write_up_files/figure-html/unnamed-chunk-4-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Here we can see a clear trend of times decreasing over the course of the session. This is due to many factors, not only track evolution. Some drivers with faster cars may not push as hard and take more risks until the later stages of the session. Also, some teams will not use brand new tires if they don’t need to. Tire age has a large impact on lap times. For the purpose of simplifying this analysis, only laps where drivers are using brand new tires will be considered.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="main_write_up_files/figure-html/unnamed-chunk-5-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This dataset contains all drivers’ hotlaps on brand new tires. The linear trend is still apparent. Visualizing this for each driver we have:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="main_write_up_files/figure-html/unnamed-chunk-6-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Assuming this shared trend is due to track evolution only, and not driver risk management, fuel loads, etc., we can try to quantify this effect.</p>
+</section>
+<section id="simple-linear-regression" class="level2">
+<h2 class="anchored" data-anchor-id="simple-linear-regression">Simple Linear Regression</h2>
+<p>A naive approach to quantifying track evolution could be a simple linear regression model with lap number as a covariate. As the number of laps driven on track increases, more rubber is laid down, causing the track to “grip up” and reduce lap times. Ambient weather also has an effect and changes over time as lap numbers increase, but for simplicity “flying lap number i”, <span class="math inline">\(l_i\)</span> is used as the covariate.</p>
+<p>A Bayesian implementation of this simple linear regression model is</p>
+<p><span class="math display">\[
+\begin{aligned}
+T_{i} \sim N(\mu_{i}, \sigma^2) \\
+\mu_{i} = \alpha + \beta_l l_{i}
+\end{aligned}
+\]</span></p>
+<p>That is, laptime <span class="math inline">\(T\)</span> for observed lap <span class="math inline">\(i\)</span> is normally distributed with mean <span class="math inline">\(\mu_i\)</span> and variance <span class="math inline">\(\sigma^2\)</span>. <span class="math inline">\(\mu_i\)</span> is linearly related to a global intercept <span class="math inline">\(\alpha\)</span> and a global slope parameter <span class="math inline">\(\beta_l\)</span>.</p>
+<p>Priors are non-informative and normally distributed:</p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha \sim N(90, 20) \\
+\beta_l \sim N(0, 1) \\
+\sigma^2 \sim Exp(1)
+\end{aligned}
+\]</span></p>
+<p>This model can be fit using rstanarm’s “stan_glm” function.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>slr <span class="ot">&lt;-</span> <span class="fu">stan_glm</span>(</span>
+<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># model</span></span>
+<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>  LapTime <span class="sc">~</span> lap, </span>
+<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># priors</span></span>
+<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_intercept =</span> <span class="fu">normal</span>(<span class="dv">90</span>, <span class="dv">20</span>, <span class="at">autoscale =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>, <span class="at">autoscale =</span> <span class="cn">TRUE</span>), </span>
+<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_aux =</span> <span class="fu">exponential</span>(<span class="dv">1</span>, <span class="at">autoscale =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>  <span class="co"># setup</span></span>
+<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian, </span>
+<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> flying_laps, </span>
+<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">10000</span>, <span class="at">seed =</span> <span class="dv">1</span>, </span>
+<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>The results are shown in the table and visualization below.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(slr)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  term        estimate std.error
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)  86.4      0.108  
+2 lap          -0.0318   0.00280</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="main_write_up_files/figure-html/unnamed-chunk-9-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>From this model, we obtain a lap coefficient of -0.032. That is, each additional hotlap on the circuit is expected to reduce a driver’s lap time by about 30 thousandths of a second.</p>
+<p>Practically, if a team chose to send their two drivers on track first, record a pair of lap times, and then wait for the other 18 cars to record their lap times, that first team could expect their next runs to be almost 0.6 seconds faster by the assumptions of this model and the data.</p>
+<p>However, this model ignores the grouped structure of the data and assumes each laptime observation is independent of the others. Because each driver tends to produce similar laptimes, laptimes are correlated within each driver.</p>
+<p>This model also does not predict well for each driver. It does not capture between driver variation, for example, the differences between Latifi’s (LAT) and Verstappen’s (VER) laptimes.</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="main_write_up_files/figure-html/unnamed-chunk-10-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>Another modeling approach could be to fit a linear model for each driver:</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="main_write_up_files/figure-html/unnamed-chunk-11-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This works, but the estimates are extremely unreliable especially for drivers with very few total laps. Additionally this doesn’t provide an overall estimate of track evolution, only one specific to each driver.</p>
+</section>
+<section id="multilevel-model" class="level2">
+<h2 class="anchored" data-anchor-id="multilevel-model">Multilevel Model</h2>
+<p>To estimate track evolution, we can use a multilevel model, specifically a varying-intercepts model. The goal is to estimate a global “slope” parameter, one that is fixed across all drivers, capturing the track evolution effect while simultaneously capturing variability between drivers. That is, a model with varying intercepts but fixed slopes across all drivers.</p>
+<p><span class="math display">\[
+\begin{aligned}
+T_{ij} \sim N(\mu_{ij}, \sigma_T^2) \\
+\mu_{ij} = \alpha_j + \beta_l l_{ij}
+\end{aligned}
+\]</span></p>
+<p>This model appears similar to the simple linear regression above but instead now relies on each driver, <span class="math inline">\(j\)</span>, and contains more parameters, one intercept term, <span class="math inline">\(\alpha_j\)</span>, for each driver <span class="math inline">\(j\)</span>.</p>
+<p>The priors are different too. Instead of assigning a global intercept prior <span class="math inline">\(\alpha\)</span>, we assign 20 intercept priors, <span class="math inline">\(\alpha_j\)</span>, each relying on a global shared prior which pools information among all drivers, <span class="math inline">\(\alpha_g\)</span>. Each variance term also gets its own non-informative prior. <span class="math inline">\(\sigma_T\)</span> represents the variance in laptimes within each driver, <span class="math inline">\(j\)</span>, and <span class="math inline">\(\sigma_{\alpha}\)</span>, the variance in laptimes between drivers.</p>
+<p><span class="math display">\[
+\begin{aligned}
+\alpha_j \sim N(\alpha_g, \sigma_{\alpha}) \ \text{for j = 1, 2, ..., 20}\\
+\alpha_g \sim N(90, 20) \\
+\beta_l \sim N(0, 1) \\
+\sigma_T \sim Exp(1) \\
+\sigma_{\alpha} \sim Exp(1)
+\end{aligned}
+\]</span></p>
+<p>Fitting this model in rstanarm using the “stan_glmer” function,</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>mlm <span class="ot">&lt;-</span> <span class="fu">stan_glmer</span>(</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>  <span class="co"># model</span></span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>  LapTime <span class="sc">~</span> lap <span class="sc">+</span> (<span class="dv">1</span> <span class="sc">|</span> Driver), </span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a>  <span class="co"># priors</span></span>
+<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_intercept =</span> <span class="fu">normal</span>(<span class="dv">90</span>, <span class="dv">20</span>),</span>
+<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior =</span> <span class="fu">normal</span>(<span class="dv">0</span>, <span class="dv">1</span>),</span>
+<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_aux =</span> <span class="fu">exponential</span>(<span class="dv">1</span>, <span class="at">autoscale =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">prior_covariance =</span> <span class="fu">decov</span>(<span class="at">reg =</span> <span class="dv">1</span>, <span class="at">conc =</span> <span class="dv">1</span>, <span class="at">shape =</span> <span class="dv">1</span>, <span class="at">scale =</span> <span class="dv">1</span>),</span>
+<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>  </span>
+<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a>  <span class="co"># setup</span></span>
+<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">family =</span> gaussian,</span>
+<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">data =</span> flying_laps,</span>
+<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>  <span class="at">chains =</span> <span class="dv">4</span>, <span class="at">iter =</span> <span class="dv">10000</span>, <span class="at">seed =</span> <span class="dv">1</span></span>
+<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+</div>
+<p>Examining the fixed effect for laptime, we see that there is a 0.010 second difference compared to the simple linear regression model. That is, track evolution may not be as high as one would expect using the simple linear regression model. The estimate for track evolution is a decrease of 0.022 seconds per flying lap.</p>
+<div class="cell">
+<div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">tidy</span>(mlm, <span class="at">effects =</span> <span class="st">'fixed'</span>)</span></code><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></pre></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 2 × 3
+  term        estimate std.error
+  &lt;chr&gt;          &lt;dbl&gt;     &lt;dbl&gt;
+1 (Intercept)  86.1      0.107  
+2 lap          -0.0221   0.00136</code></pre>
+</div>
+</div>
+<p>Practically, the scenario where a team sends their drivers, waits for all other drivers to complete flying laps, and then send their drivers again results in a track evolution difference of 0.4 seconds. Previously, the simple linear regression model predicted a difference of 0.6 seconds. This 0.2 second difference from earlier is a result of using a more correct model and is a large difference in the context of Formula 1 laptimes.</p>
+<p>Combining this global slope term with each driver’s estimated intercept term, we have</p>
+<div class="cell">
+<div class="cell-output-display">
+<p><img src="main_write_up_files/figure-html/unnamed-chunk-14-1.png" class="img-fluid" width="672"></p>
+</div>
+</div>
+<p>This model appears to generalize better to the data, providing a reliable estimate of track evolution for that day.</p>
+<p>Although this model is fairly simple, it could be extended in many ways. For example, each team produces cars that are similar to each other. This could be used as another grouping variable within a model. Additional covariates could be included such as tire life, tire compounds, weather, fuel loads, etc. Another idea is to extend this analysis across tracks and inform which tracks typically experience high degrees of track evolution. This information could be used to inform teams to optimze race and qualifying strategy decisions.</p>
+</section>
+
+</main>
+<!-- /main column -->
+<script id="quarto-html-after-body" type="application/javascript">
+window.document.addEventListener("DOMContentLoaded", function (event) {
+  const toggleBodyColorMode = (bsSheetEl) => {
+    const mode = bsSheetEl.getAttribute("data-mode");
+    const bodyEl = window.document.querySelector("body");
+    if (mode === "dark") {
+      bodyEl.classList.add("quarto-dark");
+      bodyEl.classList.remove("quarto-light");
+    } else {
+      bodyEl.classList.add("quarto-light");
+      bodyEl.classList.remove("quarto-dark");
+    }
+  }
+  const toggleBodyColorPrimary = () => {
+    const bsSheetEl = window.document.querySelector("link#quarto-bootstrap");
+    if (bsSheetEl) {
+      toggleBodyColorMode(bsSheetEl);
+    }
+  }
+  toggleBodyColorPrimary();  
+  const icon = "";
+  const anchorJS = new window.AnchorJS();
+  anchorJS.options = {
+    placement: 'right',
+    icon: icon
+  };
+  anchorJS.add('.anchored');
+  const clipboard = new window.ClipboardJS('.code-copy-button', {
+    target: function(trigger) {
+      return trigger.previousElementSibling;
+    }
+  });
+  clipboard.on('success', function(e) {
+    // button target
+    const button = e.trigger;
+    // don't keep focus
+    button.blur();
+    // flash "checked"
+    button.classList.add('code-copy-button-checked');
+    var currentTitle = button.getAttribute("title");
+    button.setAttribute("title", "Copied!");
+    setTimeout(function() {
+      button.setAttribute("title", currentTitle);
+      button.classList.remove('code-copy-button-checked');
+    }, 1000);
+    // clear code selection
+    e.clearSelection();
+  });
+  function tippyHover(el, contentFn) {
+    const config = {
+      allowHTML: true,
+      content: contentFn,
+      maxWidth: 500,
+      delay: 100,
+      arrow: false,
+      appendTo: function(el) {
+          return el.parentElement;
+      },
+      interactive: true,
+      interactiveBorder: 10,
+      theme: 'quarto',
+      placement: 'bottom-start'
+    };
+    window.tippy(el, config); 
+  }
+  const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+  for (var i=0; i<noterefs.length; i++) {
+    const ref = noterefs[i];
+    tippyHover(ref, function() {
+      // use id or data attribute instead here
+      let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+      try { href = new URL(href).hash; } catch {}
+      const id = href.replace(/^#\/?/, "");
+      const note = window.document.getElementById(id);
+      return note.innerHTML;
+    });
+  }
+  var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+  for (var i=0; i<bibliorefs.length; i++) {
+    const ref = bibliorefs[i];
+    const cites = ref.parentNode.getAttribute('data-cites').split(' ');
+    tippyHover(ref, function() {
+      var popup = window.document.createElement('div');
+      cites.forEach(function(cite) {
+        var citeDiv = window.document.createElement('div');
+        citeDiv.classList.add('hanging-indent');
+        citeDiv.classList.add('csl-entry');
+        var biblioDiv = window.document.getElementById('ref-' + cite);
+        if (biblioDiv) {
+          citeDiv.innerHTML = biblioDiv.innerHTML;
+        }
+        popup.appendChild(citeDiv);
+      });
+      return popup.innerHTML;
+    });
+  }
+});
+</script>
+</div> <!-- /content -->
+
+
+
+</body></html>

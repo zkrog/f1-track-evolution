@@ -1,0 +1,408 @@
+---
+title: "testing"
+format: html
+---
+
+
+
+```{python}
+# import fastf1
+# fastf1.Cache.enable_cache('./cache')
+# 
+# qual = fastf1.get_session(2022, 'Abu Dhabi Grand Prix', 'Q')
+# qual.load()
+# 
+# colors = qual.results[['TeamColor', 'TeamName']]
+# colors.to_csv('team_colors.csv')
+# 
+# qlaps = qual.laps
+# 
+# qlaps['LapTime'] = qlaps['LapTime'].dt.total_seconds()
+# 
+# qlaps.to_csv('laps.csv')
+```
+
+
+
+
+
+```{r}
+library(tidyverse)
+
+qlaps <- read_csv('laps.csv')
+
+team_colors <-
+  read_csv('team_colors.csv') %>%
+  select(!1) %>%
+  distinct() %>% 
+  mutate(TeamColor = paste0('#', TeamColor))
+
+df <- 
+  inner_join(qlaps, team_colors, by = c('Team' = 'TeamName')) %>% 
+  arrange(LapStartDate) %>% 
+  mutate(i = seq_len(nrow(.)),
+         TeamColor = factor(TeamColor))
+
+df %>% 
+  filter(LapTime <= 90) %>% 
+  ggplot(aes(x = LapStartDate, y = LapTime)) +
+  geom_point(size = 5, aes(color = TeamColor)) +
+  scale_color_manual(values = levels(df$TeamColor)) +
+  geom_label(aes(label = Driver), nudge_y = 0.07, nudge_x = 60, alpha = 0.3) +
+  geom_smooth(method = 'lm') +
+  facet_wrap(~Driver)
+```
+
+
+```{r}
+df %>% 
+  filter(LapTime <= 90) %>% 
+  ggplot(aes(x = LapStartDate, y = LapTime)) +
+  geom_point(size = 5, aes(color = TeamColor)) +
+  scale_color_manual(values = levels(df$TeamColor))
+```
+
+
+
+F1 qualifying begins at 2pm (data time, need to convert to track time).
+
+Q1: 18 minutes, starts at 2pm
+Q2: 15 minutes, starts at 225
+Q3: 12 minutes, starts at 248
+
+200-218 Q1 (18 minutes)
+218-225 break (7 minutes)
+225-240 Q2 (15 minutes)
+240-248 break (8 minutes)
+248-300 Q3 (12 minutes)
+
+
+
+```{r}
+df %>% 
+  filter(LapTime < 90,
+         TyreLife == 2) %>% 
+  select(LapTime, LapStartDate, Driver, Team, TeamColor, FreshTyre, TyreLife) %>% 
+  drop_na() %>% 
+  
+  ggplot(aes(x = LapStartDate, y = LapTime)) +
+  geom_point(aes(color = TeamColor)) +
+  scale_color_manual(values = levels(df$TeamColor)) +
+  geom_label(aes(label = paste(Driver, TyreLife)), nudge_y = 0.07, nudge_x = 60, alpha = 0.3, size = 2) +
+  
+  geom_vline(xintercept = as.numeric(as.POSIXct("2022-11-19 14:00:00", tz = 'UTC'))) +
+  geom_vline(xintercept = as.numeric(as.POSIXct("2022-11-19 14:18:00", tz = 'UTC'))) +
+  geom_vline(xintercept = as.numeric(as.POSIXct("2022-11-19 14:25:00", tz = 'UTC'))) +
+  geom_vline(xintercept = as.numeric(as.POSIXct("2022-11-19 14:40:00", tz = 'UTC'))) +
+  geom_vline(xintercept = as.numeric(as.POSIXct("2022-11-19 14:48:00", tz = 'UTC'))) +
+  geom_vline(xintercept = as.numeric(as.POSIXct("2022-11-19 15:00:00", tz = 'UTC'))) +
+  
+  facet_wrap(~Driver)
+```
+
+```{r}
+df %>% 
+  select(Driver, LapStartDate, LapTime) %>% 
+  drop_na() %>% 
+  
+  ggplot(aes(x = LapStartDate, y = LapTime)) +
+  geom_point()
+
+
+
+df %>% 
+  filter(LapTime < 90, TyreLife == 2) %>% 
+  select(Driver, LapStartDate, LapTime) %>% 
+  drop_na() %>% 
+  mutate(lap = 1:nrow(.)) %>% 
+  
+  ggplot(aes(x = lap, y = LapTime, color = Driver, group = Driver)) +
+  geom_point() +
+  geom_line() +
+  facet_wrap(~Driver) 
+```
+
+
+
+```{r}
+df %>% 
+  filter(LapTime < 90, TyreLife == 2) %>% 
+  select(Driver, LapStartDate, LapTime) %>% 
+  drop_na() %>% 
+  mutate(lap = 1:nrow(.)) %>% 
+  nest_by(Driver) %>% 
+  mutate(m = list(lm(LapTime ~ lap, data = data))) %>% 
+  summarize(broom::tidy(m)) %>% 
+  filter(term == 'lap') %>% 
+  arrange(estimate) %>% 
+  
+  ggplot(aes(x = estimate)) +
+  geom_density() + 
+  geom_rug() +
+  geom_vline(xintercept = 0)
+```
+
+
+
+
+
+
+
+```{r}
+df %>% 
+  filter(LapTime < 90, TyreLife == 2) %>% 
+  select(Driver, LapStartDate, LapTime) %>% 
+  drop_na() %>% 
+  mutate(lap = 1:nrow(.)) %>% 
+  
+  ggplot(aes(x = lap, y = LapTime, color = Driver, group = Driver)) +
+  geom_point() +
+  geom_line()
+```
+
+Best estimate of track evolution given a linear model
+
+```{r}
+df %>% 
+  filter(LapTime < 90, TyreLife == 2) %>% 
+  select(Driver, LapStartDate, LapTime) %>% 
+  drop_na() %>% 
+  mutate(lap = 1:nrow(.)) %>% 
+  
+  ggplot(aes(x = lap, y = LapTime)) +
+  geom_point() +
+  geom_smooth(method = 'lm')
+```
+
+
+```{r}
+df %>% 
+  filter(LapTime < 90, TyreLife == 2) %>% 
+  select(Driver, LapStartDate, LapTime) %>% 
+  drop_na() %>% 
+  mutate(lap = 1:nrow(.)) %>% 
+  lm(LapTime ~ lap, data = .) %>% 
+  broom::tidy()
+```
+```{r}
+library(R2WinBUGS)
+```
+
+
+```{r}
+# Load packages
+library(bayesrules)
+library(tidyverse)
+library(rstanarm)
+library(bayesplot)
+library(tidybayes)
+library(broom.mixed)
+
+# Load data
+data(cherry_blossom_sample)
+running <- cherry_blossom_sample
+```
+
+
+
+
+
+```{r}
+f1 <- 
+  df %>% 
+  filter(LapTime < 90, TyreLife == 2) %>% 
+  select(Driver, LapStartDate, LapTime) %>% 
+  drop_na() %>% 
+  mutate(lap = 1:nrow(.),
+         Driver = as.factor(Driver)) 
+
+f1
+```
+
+
+```{r}
+f1_model_1_prior <- stan_glmer(
+  LapTime ~ lap + (1 | Driver), 
+  data = f1, family = gaussian,
+  prior_intercept = normal(90, 20),
+  prior = normal(0, 1), 
+  prior_aux = exponential(1, autoscale = TRUE),
+  prior_covariance = decov(reg = 1, conc = 1, shape = 1, scale = 1),
+  chains = 1, iter = 5000*2, seed = 84735, 
+  prior_PD = TRUE)
+```
+
+
+
+```{r}
+f1 %>% 
+  add_fitted_draws(f1_model_1_prior, n = 4) %>%
+  ggplot(aes(x = lap, y = LapTime)) +
+    geom_line(aes(y = .value, group = paste(Driver, .draw))) + 
+    facet_wrap(~ .draw)
+
+f1 %>%
+  add_predicted_draws(f1_model_1_prior, n = 100) %>%
+  ggplot(aes(x = LapTime)) +
+    geom_density(aes(x = .prediction, group = .draw)) 
+```
+
+
+```{r}
+# Simulate the posterior
+f1_model_1 <- update(f1_model_1_prior, prior_PD = FALSE)
+
+# Check the prior specifications
+prior_summary(f1_model_1)
+
+# Markov chain diagnostics
+mcmc_trace(f1_model_1)
+mcmc_dens_overlay(f1_model_1)
+mcmc_acf(f1_model_1)
+neff_ratio(f1_model_1)
+rhat(f1_model_1)
+```
+
+
+
+```{r}
+tidy_summary_1 <- tidy(f1_model_1, effects = "fixed",
+                       conf.int = TRUE, conf.level = 0.80)
+tidy_summary_1
+```
+
+
+
+
+```{r}
+B0 <- tidy_summary_1$estimate[1]
+B1 <- tidy_summary_1$estimate[2]
+
+f1 %>%
+  add_fitted_draws(f1_model_1, n = 200, re_formula = NA) %>%
+  
+  ggplot(aes(x = lap, y = LapTime)) +
+  geom_line(aes(y = .value, group = .draw), alpha = 0.1) +
+  geom_abline(intercept = B0, slope = B1, color = "blue") +
+  geom_point() +
+  geom_smooth(method = 'lm', color = 'red')
+```
+
+
+
+
+
+```{r}
+# Posterior summaries of runner-specific intercepts
+f1_summaries_1 <- 
+  f1_model_1 %>%
+  spread_draws(`(Intercept)`, b[,Driver]) %>% 
+  mutate(driver_intercept = `(Intercept)` + b) %>% 
+  select(-`(Intercept)`, -b) %>% 
+  median_qi(.width = 0.80) %>% 
+  select(Driver, driver_intercept, .lower, .upper)
+
+f1_summaries_1
+```
+
+
+Compare to no pooling and observe shrinkage
+
+```{r}
+no_pooled_intercepts <- 
+  f1 %>% 
+  nest_by(Driver) %>% 
+  mutate(m = list(lm(LapTime ~ lap, data = data))) %>%
+  summarize(tidy(m)) %>% 
+  filter(term == '(Intercept)')
+```
+
+```{r}
+no_pooled_intercepts
+```
+
+```{r}
+pp_intercepts <- 
+  f1_summaries_1 %>% 
+  separate(Driver, c('x', 'Driver'), sep = ':') %>% 
+  select(!x)
+```
+
+```{r}
+inner_join(no_pooled_intercepts, pp_intercepts, by = 'Driver') %>% 
+  select(driver = 'Driver',
+         no_pooled = 'estimate',
+         partial = 'driver_intercept') %>% 
+  pivot_longer(!driver, names_to = 'pooling', values_to = 'intercept') %>% 
+  
+  ggplot(aes(x = pooling, y = intercept, group = driver, color = driver)) +
+  geom_point() +
+  geom_line()
+```
+
+
+
+
+
+```{r}
+# 100 posterior plausible models for runners 4 & 5
+f1 %>%
+  add_fitted_draws(f1_model_1, n = 100) %>%
+  ggplot(aes(x = lap, y = LapTime)) +
+    geom_line(
+      aes(y = .value, group = paste(Driver, .draw), color = Driver),
+      alpha = 0.1) +
+    geom_point(aes(color = Driver)) +
+  facet_wrap(~Driver)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
